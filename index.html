@@ -1,0 +1,605 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Order form → live account · built for Mach9</title>
+<meta name="description" content="Paste a signed order form. Get the billing schedule, the customer setup checklist and the blockers before the first invoice.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter+Tight:wght@500;600&family=Inter:wght@400;500&family=Roboto+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#101010; --panel:#161616; --panel2:#1c1c1c; --line:#2a2a2a; --line2:#3a3a3a;
+  --text:#f4f4f4; --muted:#9a9a9a; --dim:#6b6b6b;
+  --blue:#505EF7; --blue2:#6B7CFF; --mag:#FE05B7; --ok:#4fd18b; --warn:#f2b84b; --bad:#ff5a5f;
+  --sans:"Inter",system-ui,-apple-system,sans-serif; --display:"Inter Tight","Inter",system-ui,sans-serif;
+  --mono:"Roboto Mono",ui-monospace,SFMono-Regular,Menlo,monospace;
+}
+*{box-sizing:border-box}
+html,body{margin:0;background:var(--bg);color:var(--text);font-family:var(--sans);font-size:15px;line-height:1.5;-webkit-font-smoothing:antialiased}
+a{color:var(--blue2)}
+.wrap{max-width:1240px;margin:0 auto;padding:0 24px}
+header.top{border-bottom:1px solid var(--line)}
+header.top .wrap{display:flex;justify-content:space-between;align-items:center;height:64px}
+.mark{font-family:var(--mono);font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:var(--text)}
+.mark b{color:var(--blue2);font-weight:500}
+.tag{font-family:var(--mono);font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--dim)}
+.hero{padding:56px 0 36px;border-bottom:1px solid var(--line);position:relative;overflow:hidden}
+.eyebrow{font-family:var(--mono);color:var(--blue2);letter-spacing:.12em;text-transform:uppercase;font-size:13px;margin:0 0 18px}
+h1{font-family:var(--display);font-weight:600;font-size:clamp(32px,5vw,56px);line-height:1.04;letter-spacing:-.035em;margin:0 0 18px;max-width:900px}
+.lede{color:var(--muted);font-size:clamp(16px,1.6vw,19px);max-width:720px;margin:0}
+.annot{position:absolute;right:24px;top:58px;font-family:var(--mono);font-size:11px;color:var(--dim);text-align:right;line-height:1.9;letter-spacing:.04em}
+.annot span{color:var(--mag)}
+@media(max-width:980px){.annot{display:none}}
+.grid{display:grid;grid-template-columns:minmax(0,5fr) minmax(0,7fr);gap:0;max-width:1240px;margin:0 auto}
+main{border-bottom:1px solid var(--line)}
+.pane{overflow-x:auto}
+@media(max-width:980px){.grid{grid-template-columns:minmax(0,1fr)}}
+.col{padding:28px 24px}
+.col.left{border-right:1px solid var(--line)}
+@media(max-width:980px){.col.left{border-right:0;border-bottom:1px solid var(--line)}}
+.label{font-family:var(--mono);font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);margin:0 0 10px;display:flex;justify-content:space-between;gap:12px;align-items:baseline}
+.label .r{color:var(--dim)}
+.demos{display:flex;flex-wrap:wrap;gap:8px;margin:0 0 14px}
+button,.btn{font-family:var(--mono);font-size:12px;letter-spacing:.1em;text-transform:uppercase;background:transparent;color:var(--text);border:1px solid var(--line2);padding:9px 12px;cursor:pointer;border-radius:0}
+button:hover,.btn:hover{border-color:var(--text)}
+button.primary{background:var(--blue);border-color:var(--blue);color:#fff}
+button.primary:hover{background:#5f6cff}
+button.on{border-color:var(--blue2);color:var(--blue2)}
+textarea{width:100%;min-height:440px;background:var(--panel);color:var(--text);border:1px solid var(--line);padding:14px;font-family:var(--mono);font-size:12.5px;line-height:1.65;resize:vertical;border-radius:0}
+textarea:focus,input:focus,select:focus{outline:1px solid var(--blue);outline-offset:-1px}
+.row{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-top:12px}
+.hint{color:var(--dim);font-size:12px;margin-top:10px}
+.status{border:1px solid var(--line);padding:18px 20px;margin-bottom:22px;display:flex;gap:16px;align-items:flex-start}
+.status .dot{width:10px;height:10px;margin-top:9px;flex:none}
+.status h2{font-family:var(--display);font-weight:600;letter-spacing:-.02em;font-size:24px;line-height:1.2;margin:0 0 4px}
+.status p{margin:0;color:var(--muted)}
+.status.ok .dot{background:var(--ok)} .status.warn .dot{background:var(--warn)} .status.bad .dot{background:var(--bad)} .status.idle .dot{background:var(--dim)}
+.tabs{display:flex;border-bottom:1px solid var(--line);margin-bottom:18px;overflow-x:auto}
+.tabs button{border:0;border-bottom:2px solid transparent;padding:12px 14px;color:var(--muted);white-space:nowrap}
+.tabs button.active{color:var(--text);border-bottom-color:var(--blue)}
+.pane{display:none}.pane.active{display:block}
+table{width:100%;border-collapse:collapse;font-size:13.5px}
+th{font-family:var(--mono);font-weight:400;font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--dim);text-align:left;padding:8px 10px;border-bottom:1px solid var(--line)}
+td{padding:10px;border-bottom:1px solid var(--line);vertical-align:top}
+td.num,th.num{text-align:right;font-family:var(--mono);font-variant-numeric:tabular-nums}
+td.mono{font-family:var(--mono);font-size:12.5px}
+tfoot td{color:var(--muted);font-family:var(--mono)}
+.pill{display:inline-block;font-family:var(--mono);font-size:10.5px;letter-spacing:.08em;text-transform:uppercase;padding:2px 7px;border:1px solid var(--line2);color:var(--muted)}
+.pill.bad{color:var(--bad);border-color:rgba(255,90,95,.45)} .pill.warn{color:var(--warn);border-color:rgba(242,184,75,.45)} .pill.ok{color:var(--ok);border-color:rgba(79,209,139,.4)} .pill.blue{color:var(--blue2);border-color:rgba(107,124,255,.5)}
+.checks li{list-style:none;display:grid;grid-template-columns:92px 1fr;gap:12px;padding:11px 0;border-bottom:1px solid var(--line)}
+.checks{padding:0;margin:0}
+.checks .t{font-weight:500}
+.checks .d{color:var(--muted);font-size:13px}
+.terms{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px 14px}
+@media(max-width:560px){.terms{grid-template-columns:1fr}}
+.field label{display:flex;justify-content:space-between;font-family:var(--mono);font-size:10.5px;letter-spacing:.1em;text-transform:uppercase;color:var(--dim);margin-bottom:4px}
+.field input,.field select{width:100%;background:var(--panel);border:1px solid var(--line);color:var(--text);padding:8px 10px;font-family:var(--sans);font-size:14px;border-radius:0}
+.field.missing input{border-color:rgba(255,90,95,.55)}
+.src{color:var(--dim)} .src.found{color:var(--ok)} .src.missing{color:var(--bad)} .src.edited{color:var(--blue2)}
+.phase{font-family:var(--mono);font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:var(--blue2);margin:18px 0 6px}
+.task{display:grid;grid-template-columns:22px 1fr auto;gap:10px;padding:10px 0;border-bottom:1px solid var(--line);align-items:start}
+.task input{margin-top:4px;accent-color:var(--blue)}
+.task .when{font-family:var(--mono);font-size:12px;color:var(--muted);white-space:nowrap}
+.task .sub{color:var(--muted);font-size:13px}
+.task.flag .t::after{content:"  ·  check";color:var(--warn);font-family:var(--mono);font-size:11px}
+pre.out{background:var(--panel);border:1px solid var(--line);padding:14px;font-family:var(--mono);font-size:12.5px;line-height:1.7;white-space:pre-wrap;margin:0;color:#d8d8d8}
+.kv{display:grid;grid-template-columns:200px 1fr;border-top:1px solid var(--line)}
+.kv div{padding:9px 0;border-bottom:1px solid var(--line)}
+.kv div:nth-child(odd){font-family:var(--mono);font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--dim);padding-top:11px}
+@media(max-width:560px){.kv{grid-template-columns:1fr}.kv div:nth-child(odd){border-bottom:0;padding-bottom:0}}
+details.rubric{border:1px solid var(--line);margin-top:18px}
+details.rubric summary{cursor:pointer;padding:12px 14px;font-family:var(--mono);font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted)}
+details.rubric .in{padding:0 14px 14px}
+.small{font-size:12.5px;color:var(--muted)}
+footer{padding:28px 0 48px;color:var(--dim);font-size:12.5px}
+footer .wrap{display:flex;justify-content:space-between;gap:24px;flex-wrap:wrap}
+footer p{margin:0 0 6px;max-width:760px}
+.mob-only{display:none}
+@media(max-width:560px){.wrap{padding:0 16px}.col{padding:22px 16px}.hero{padding:40px 0 28px}textarea{min-height:300px}td,th{padding:8px 6px}table{font-size:12.5px}.hide-sm{display:none}}
+</style>
+</head>
+<body>
+<header class="top"><div class="wrap">
+  <div class="mark">Order form <b>→</b> live account</div>
+  <div class="tag">Built for Mach9 · BizOps</div>
+</div></header>
+
+<section class="hero"><div class="wrap">
+  <p class="eyebrow">Quote-to-cash · billing · customer setup</p>
+  <h1>Signed order form in. Billing schedule and customer setup out.</h1>
+  <p class="lede">Billing and onboarding both work from the order form. This reads it once, checks it against a rubric, flags anything that blocks the first invoice, and turns it into an invoice schedule, a setup checklist and CRM fields. Nothing leaves your browser.</p>
+  <div class="annot" aria-hidden="true">OF-0142 → INV-01<br>NET 45 · PO <span>MISSING</span><br>CRS NAD83 · DGN<br>STN 01 → GO-LIVE</div>
+</div></section>
+
+<main class="grid">
+  <section class="col left">
+    <div class="label"><span>Order form</span><span class="r">paste text or drop a PDF</span></div>
+    <div class="demos" id="demos"></div>
+    <textarea id="src" spellcheck="false" placeholder="Paste the order form text here, or drop a PDF onto this box."></textarea>
+    <div class="row">
+      <button class="primary" id="run">Read order form</button>
+      <label class="btn" for="file">Upload PDF</label>
+      <input type="file" id="file" accept=".pdf,.txt" hidden>
+      <button id="clear">Clear</button>
+    </div>
+    <p class="hint">Demo order forms are invented: customers, prices and terms are placeholders, not Mach9's. Labels are matched loosely ("Payment terms", "Net 45", "PO #"), and anything the reader misses can be typed into Extracted terms.</p>
+
+    <details class="rubric" id="rubricBox">
+      <summary>Rubric and standards (editable)</summary>
+      <div class="in" id="rubricIn"></div>
+    </details>
+  </section>
+
+  <section class="col right">
+    <div class="status idle" id="status"><div class="dot"></div><div><h2>Load a demo or paste an order form</h2><p>Start with the agency demo. It has one blocker.</p></div></div>
+    <nav class="tabs" id="tabs">
+      <button data-p="checks" class="active">Checks</button>
+      <button data-p="billing">Billing schedule</button>
+      <button data-p="setup">Customer setup</button>
+      <button data-p="terms">Extracted terms</button>
+      <button data-p="crm">CRM / handoff</button>
+    </nav>
+    <div class="pane active" id="p-checks"></div>
+    <div class="pane" id="p-billing"></div>
+    <div class="pane" id="p-setup"></div>
+    <div class="pane" id="p-terms"></div>
+    <div class="pane" id="p-crm"></div>
+  </section>
+</main>
+
+<footer><div class="wrap">
+  <div>
+    <p>Built by Jake Makking-Robinson for the Mach9 Business Operations Associate application. Not a Mach9 product.</p>
+    <p>Runs entirely in the browser: pasted text and PDFs are never uploaded. Supported hardware and export formats are taken from mach9.ai (2 Nov 2026) and are editable in the rubric. Billing math: discounts apply to recurring fees only; one-time fees go on the first invoice, or on their own invoice at start when billing is in arrears; usage fees are billed on actuals and kept out of contract value.</p>
+  </div>
+  <div class="tag">v1 · Nov 2026</div>
+</div></footer>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+<script>
+/* ---------------- demo order forms (invented) ---------------- */
+const DEMOS = {
+agency: {name:"State DOT (demo)", text:
+`ORDER FORM (DEMO, INVENTED)
+Order form #: OF-2026-0142
+Customer: Cascade State Department of Transportation
+Bill to: Accounts Payable, Cascade State DOT, PO Box 47300, Olympia
+Billing contact: ap-invoices@cascadedot.example
+
+Subscription start date: 1 Dec 2026
+Subscription term: 24 months
+Billing frequency: Quarterly in arrears
+Payment terms: Net 45
+PO required: Yes
+PO number:
+Renewal: Auto-renews for 12 months unless either party gives 60 days' notice
+
+Fees:
+- Platform subscription | 15 seats | $2,400 per seat per year
+- Processing credits | 2,000 credits | $30 per credit per year
+- Onboarding and training | 1 | $12,000 one-time
+Discount: 10%
+Total contract value: $184,800
+
+Project setup:
+Scanner hardware: Leica Pegasus TRK700
+Deliverable format: DGN (MicroStation)
+Coordinate system: NAD83(2011) / State Plane North, US survey feet
+CAD standards: Agency CAD standards v4 (feature library attached as Exhibit B)
+Users: r.alvarez@cascadedot.example, m.chen@cascadedot.example, j.okafor@cascadedot.example, s.berg@cascadedot.example, t.nguyen@cascadedot.example, l.price@cascadedot.example
+
+Special terms: Customer may terminate for convenience on 30 days' written notice.
+
+Signed by Customer: Dana Whitfield, Contracts Officer, 18 Nov 2026
+Signed by Mach9: 19 Nov 2026`},
+firm: {name:"Engineering firm (demo)", text:
+`ORDER FORM (DEMO, INVENTED)
+Order form #: OF-2026-0139
+Customer: Northline Engineering Group, LLC
+Billing contact: accounting@northline.example
+
+Subscription start date: 15 Nov 2026
+Subscription term: 12 months
+Billing frequency: Annual in advance
+Payment terms: Net 30
+PO required: No
+Renewal: Auto-renews for 12 months unless either party gives 30 days' notice
+
+Fees:
+- Platform subscription | 8 seats | $2,400 per seat per year
+- Processing credits | 1,000 credits | $30 per credit per year
+- Onboarding | 1 | $5,000 one-time
+Discount: 0%
+Total contract value: $54,200
+
+Project setup:
+Scanner hardware: RIEGL VMX-2HA
+Deliverable format: DXF (Civil 3D)
+Coordinate system: NAD83 / California zone 3, US survey feet
+CAD standards: Northline drafting standard 2025
+Users: p.ramos@northline.example, k.lee@northline.example, a.shah@northline.example
+
+Signed by Customer: Priya Ramos, Principal, 28 Oct 2026
+Signed by Mach9: 29 Oct 2026`},
+telecom: {name:"Fiber contractor (demo)", text:
+`ORDER FORM (DEMO, INVENTED)
+Order form #: OF-2026-0133
+Customer: Ridgefield Fiber Constructors Inc.
+
+Subscription start date: 1 Oct 2026
+Subscription term: 12 months
+Billing frequency: Monthly in advance
+Payment terms: Net 60
+Renewal: Auto-renews for 12 months
+
+Fees:
+- Platform subscription | 20 seats | $2,400 per seat per year
+- Processing overage | per mile | $85 per mile, billed monthly in arrears
+Discount: 25%
+Total contract value: $40,000
+
+Project setup:
+Scanner hardware: Trimble MX50 and Mosaic 51
+Deliverable format: KMZ
+Users: ops@ridgefieldfiber.example
+
+Special terms: Most favored customer pricing for the initial term.
+
+Signed by Customer: Eli Novak, COO, 14 Oct 2026
+Signed by Mach9:`}
+};
+
+/* ---------------- rubric / standards ---------------- */
+const STD = {
+  netDays: 30,
+  billing: "Annual in advance",
+  maxDiscount: 15,
+  hardware: ["Leica","Phoenix","RIEGL","Trimble","NavVis"],
+  formats: ["DXF","DGN","Esri Feature Service","Field-to-finish"],
+  watch: ["terminate for convenience","termination for convenience","most favored","most-favored","mfn","acceptance","milestone","liquidated damages","net 60","net 90","price lock","refund"]
+};
+
+/* ---------------- dates (UTC only) ---------------- */
+const MON = {jan:0,feb:1,mar:2,apr:3,may:4,jun:5,jul:6,aug:7,sep:8,sept:8,oct:9,nov:10,dec:11};
+function parseDate(s){
+  if(!s) return null; s = s.trim();
+  let m;
+  if((m=s.match(/(\d{4})-(\d{1,2})-(\d{1,2})/))) return D(+m[1],+m[2]-1,+m[3]);
+  if((m=s.match(/(\d{1,2})(?:st|nd|rd|th)?\s+([A-Za-z]{3,9})\.?,?\s+(\d{4})/)) && monIdx(m[2])!==undefined) return D(+m[3],monIdx(m[2]),+m[1]);
+  if((m=s.match(/([A-Za-z]{3,9})\.?\s+(\d{1,2})(?:st|nd|rd|th)?,?\s+(\d{4})/)) && monIdx(m[1])!==undefined) return D(+m[3],monIdx(m[1]),+m[2]);
+  if((m=s.match(/(\d{1,2})\/(\d{1,2})\/(\d{4})/))) return D(+m[3],+m[1]-1,+m[2]); // US m/d/y
+  return null;
+}
+function monIdx(w){ w=w.toLowerCase(); return MON[w.slice(0,4)]!==undefined?MON[w.slice(0,4)]:MON[w.slice(0,3)]; }
+function D(y,m,d){ const t=new Date(Date.UTC(y,m,d)); return isNaN(t)?null:t; }
+function addDays(d,n){ return new Date(d.getTime()+n*864e5); }
+function addMonths(d,n){ const y=d.getUTCFullYear(), m=d.getUTCMonth()+n, day=d.getUTCDate(); const last=new Date(Date.UTC(y,m+1,0)).getUTCDate(); return new Date(Date.UTC(y,m,Math.min(day,last))); }
+function iso(d){ return d? d.toISOString().slice(0,10):""; }
+function fmtD(d){ return d? d.toLocaleDateString("en-US",{timeZone:"UTC",day:"numeric",month:"short",year:"numeric"}):"—"; }
+const $ = n => "$"+(Math.round(n*100)/100).toLocaleString("en-US",{minimumFractionDigits:2,maximumFractionDigits:2});
+const $0 = n => "$"+Math.round(n).toLocaleString("en-US");
+const esc = s => String(s??"").replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+const money = s => { const m=String(s).match(/\$\s?([\d,]+(?:\.\d+)?)/); return m? parseFloat(m[1].replace(/,/g,"")):null; };
+
+/* ---------------- parser ---------------- */
+function field(text, labels){
+  for(const l of labels){
+    const re = new RegExp("^[ \\t•*\\-]*"+l+"[ \\t]*[:#\\-–—][ \\t]*(.*)$","im");
+    const m = text.match(re);
+    if(m) return m[1].trim();
+  }
+  return null;
+}
+function parse(text){
+  const t = text.replace(/\r/g,"");
+  const f = {};
+  const src = {};
+  const set=(k,v)=>{ f[k]=v; src[k]= (v===null||v===undefined||v==="")?"missing":"found"; };
+
+  set("orderNo", field(t,["Order form #","Order form number","Order form no\\.?","Order number","Order #","Quote #","Quote number"]));
+  set("customer", field(t,["Customer legal name","Customer name","Customer","Client","Company"]));
+  set("billContact", (field(t,["Billing contact","AP contact","Invoice to","Accounts payable"])||""));
+  const startRaw = field(t,["Subscription start date","Service start date","Start date","Effective date","Commencement date"]);
+  set("start", iso(parseDate(startRaw)));
+  const termRaw = field(t,["Subscription term","Initial term","Term"]);
+  let term=null; if(termRaw){ const m=termRaw.match(/(\d+)\s*(month|mo|year|yr)/i); if(m) term = /y/i.test(m[2])? +m[1]*12 : +m[1]; }
+  set("term", term);
+  const billRaw = field(t,["Billing frequency","Billing schedule","Invoicing frequency","Invoicing","Billing"]) || "";
+  let freq=null; if(/annual|yearly/i.test(billRaw)) freq="Annual"; else if(/quarter/i.test(billRaw)) freq="Quarterly"; else if(/month/i.test(billRaw)) freq="Monthly"; else if(/upfront|up-front|in full|one payment/i.test(billRaw)) freq="Upfront";
+  set("freq", freq);
+  f.timing = /arrear/i.test(billRaw) ? "arrears" : "advance"; src.timing = billRaw? "found":"missing";
+  const payRaw = field(t,["Payment terms","Payment"]) || (t.match(/net\s*\d+/i)||[null])[0];
+  let net=null; if(payRaw){ const m=String(payRaw).match(/net\s*(\d+)/i)||String(payRaw).match(/(\d+)\s*days/i); if(m) net=+m[1]; else if(/receipt/i.test(payRaw)) net=0; }
+  set("net", net);
+  const poReq = field(t,["PO required","Purchase order required"]);
+  f.poRequired = poReq? /^y|true|required/i.test(poReq) : /purchase order|PO number|PO #/i.test(t) && !/PO required:\s*no/i.test(t);
+  src.poRequired = poReq? "found":"default";
+  set("po", field(t,["PO number","PO #","PO no\\.?","Purchase order number","Purchase order"]) || "");
+  if(!f.po) src.po="missing";
+  const disc = field(t,["Discount"]); f.discount = disc? parseFloat((disc.match(/[\d.]+/)||[0])[0]) : 0; src.discount = disc? "found":"default";
+  const tcv = field(t,["Total contract value","TCV","Contract total","Order total","Total"]); f.statedTotal = tcv? money(tcv):null; src.statedTotal = f.statedTotal!==null?"found":"missing";
+  const ren = field(t,["Renewal","Auto-renewal","Auto renewal"]) || "";
+  f.autoRenew = /auto/i.test(ren); src.autoRenew = ren? "found":"missing";
+  const nd = ren.match(/(\d+)\s*days/i); f.noticeDays = nd? +nd[1] : null; src.noticeDays = nd? "found":"missing";
+  set("hardware", field(t,["Scanner hardware","Capture hardware","Scanner","Sensor","Hardware"]));
+  set("format", field(t,["Deliverable format","Export format","Output format","CAD format","Deliverables?"]));
+  set("crs", field(t,["Coordinate system","CRS","Datum / projection","Projection","Horizontal datum"]));
+  set("cad", field(t,["CAD standards","Feature library","Drafting standard"]) || "");
+  const users = (field(t,["Users","Named users","Seats? users"])||"").match(/[\w.+-]+@[\w.-]+\.\w+/g) || [];
+  f.users = users.join(", "); src.users = users.length? "found":"missing";
+  const sc = t.match(/signed by customer[ \t]*[:\-–][ \t]*(.*)$/im), sm = t.match(/signed by mach9[ \t]*[:\-–][ \t]*(.*)$/im);
+  const scd = sc && parseDate(sc[1]), smd = sm && parseDate(sm[1]);
+  set("custSigned", scd? iso(scd) : (sc && sc[1].trim()? "signed, no date":""));
+  set("mach9Signed", smd? iso(smd) : (sm && sm[1].trim()? "signed, no date":""));
+  f.special = field(t,["Special terms","Additional terms","Non-standard terms"]) || "";
+
+  // line items
+  const items=[];
+  t.split("\n").forEach(line=>{
+    if(!/^\s*[-•*]\s+/.test(line) || !/\$/.test(line)) return;
+    const raw=line.replace(/^\s*[-•*]\s+/,"");
+    const parts=raw.split(/\s*[|]\s*|\s+[—–]\s+/);
+    const name=parts[0].trim();
+    const price=money(raw);
+    let qty=1; const q=raw.match(/\|\s*([\d,]+)\s*(seats?|users?|credits?|licen[cs]es?|units?|miles?|km)?\s*(\||$)/i) || raw.match(/\b([\d,]+)\s+(seats?|users?|credits?|licen[cs]es?|units?)\b/i);
+    if(q) qty=parseFloat(q[1].replace(/,/g,""));
+    let type="annual";
+    if(/one[- ]?time|setup fee|implementation/i.test(raw)) type="one-time";
+    else if(/arrears|overage|per mile|per km|usage|as used|actuals/i.test(raw) && /per (mile|km|scan|credit|hour)/i.test(raw) && /overage|arrears|usage|actuals/i.test(raw)) type="usage";
+    else if(/per month|\/mo\b|monthly/i.test(raw)) type="monthly";
+    const unitM = raw.match(/per (seat|user|credit|mile|km|licen[cs]e|unit)/i);
+    items.push({name, qty, price: price??0, type, unit: unitM? unitM[1]:""});
+  });
+  f.items=items; src.items = items.length? "found":"missing";
+  // watch-list clauses anywhere in text
+  f.flagsText = STD.watch.filter(w=>t.toLowerCase().includes(w));
+  return {f, src};
+}
+
+/* ---------------- compute ---------------- */
+function compute(f){
+  const out={};
+  const recurAnnual = f.items.filter(i=>i.type==="annual").reduce((s,i)=>s+i.qty*i.price,0) + f.items.filter(i=>i.type==="monthly").reduce((s,i)=>s+i.qty*i.price*12,0);
+  const oneTime = f.items.filter(i=>i.type==="one-time").reduce((s,i)=>s+i.qty*i.price,0);
+  const usage = f.items.filter(i=>i.type==="usage");
+  const disc = (+f.discount||0)/100;
+  out.arr = recurAnnual*(1-disc);
+  out.listArr = recurAnnual;
+  out.oneTime=oneTime; out.usage=usage;
+  const term=+f.term||0;
+  out.tcv = out.arr*term/12 + oneTime;
+  const start = parseDate(f.start);
+  out.start=start;
+  out.end = start&&term? addDays(addMonths(start,term),-1):null;
+  out.renewNotice = out.end && f.noticeDays? addDays(out.end,-(+f.noticeDays)) : null;
+  // schedule
+  const per = {Annual:12,Quarterly:3,Monthly:1,Upfront:term||12}[f.freq] || null;
+  out.per=per;
+  const rows=[];
+  if(start && term && per){
+    const n=Math.ceil(term/per);
+    for(let i=0;i<n;i++){
+      const ps=addMonths(start,i*per);
+      const pe=addDays(addMonths(start,Math.min((i+1)*per,term)),-1);
+      const months=Math.min(per,term-i*per);
+      let amt = out.arr*months/12;
+      const inv = f.timing==="arrears"? addDays(pe,1) : ps;
+      const lines=[{d:`Recurring, ${fmtD(ps)} to ${fmtD(pe)}`,a:amt}];
+      if(i===0 && oneTime && f.timing!=="arrears"){ f.items.filter(x=>x.type==="one-time").forEach(x=>lines.push({d:x.name+" (one-time)",a:x.qty*x.price})); amt+=oneTime; }
+      rows.push({n:i+1,inv,due:addDays(inv,+f.net||0),ps,pe,amt,lines});
+    }
+  }
+  if(rows.length && oneTime && f.timing==="arrears"){ // one-time fees invoiced at start, not a quarter later
+    rows.unshift({n:0,inv:start,due:addDays(start,+f.net||0),ps:start,pe:start,amt:oneTime,lines:f.items.filter(x=>x.type==="one-time").map(x=>({d:x.name+" (one-time, billed at start)",a:x.qty*x.price}))});
+  }
+  rows.sort((a,b)=>a.inv-b.inv).forEach((r,i)=>r.n=i+1);
+  out.rows=rows;
+  return out;
+}
+
+/* ---------------- checks (rubric) ---------------- */
+function check(f,c){
+  const R=[]; const add=(sev,t,d)=>R.push({sev,t,d});
+  const req=[["customer","Customer name"],["start","Start date"],["term","Term"],["freq","Billing frequency"],["net","Payment terms"]];
+  const miss=req.filter(([k])=>f[k]===null||f[k]===""||f[k]===undefined).map(x=>x[1]);
+  if(miss.length) add("bad","Missing commercial terms", miss.join(", ")+". The schedule can't be built until these are filled in.");
+  else add("ok","Commercial terms complete","Customer, start date, term, billing frequency and payment terms all present.");
+  if(!f.items.length) add("bad","No fee lines found","Add line items to the order form, or check the fee table formatting.");
+  if(!f.custSigned || !f.mach9Signed) add("bad","Not countersigned", (!f.custSigned&&!f.mach9Signed)?"Neither signature block is completed.":(!f.custSigned?"Customer signature missing.":"Mach9 countersignature missing.")+" Don't invoice or provision until both have signed.");
+  else add("ok","Signed by both parties", `Customer ${f.custSigned}, Mach9 ${f.mach9Signed}.`);
+  if(f.poRequired && !f.po) add("bad","PO required but no PO number","The customer's AP will reject an invoice without it. Request the PO before invoice #1"+(c.rows[0]?` (${fmtD(c.rows[0].inv)}).`:"."));
+  else if(f.poRequired) add("ok","PO on file", f.po);
+  const cs = parseDate(f.custSigned);
+  if(cs && c.start && c.start < cs) add("warn","Start date before customer signature", `Service starts ${fmtD(c.start)} but the customer signed ${fmtD(cs)}. Confirm the backdate is intended; it pulls revenue into an earlier period.`);
+  if(f.net!==null && f.net!=="" && +f.net > STD.netDays) add("warn",`Payment terms Net ${f.net}`, `Standard is Net ${STD.netDays}. Adds ${+f.net-STD.netDays} days to cash collection on every invoice.`);
+  if(f.freq && (f.freq+" in "+f.timing).toLowerCase() !== STD.billing.toLowerCase() && !(f.freq==="Upfront")) add("warn",`Billing: ${f.freq} in ${f.timing}`, `Standard is ${STD.billing}. ${f.timing==="arrears"?"Billing in arrears means the first cash arrives after the first period ends.":""}`.trim());
+  if(+f.discount > STD.maxDiscount) add("warn",`Discount ${f.discount}%`, `Above the ${STD.maxDiscount}% threshold. Confirm approval is on record.`);
+  if(f.statedTotal!==null && f.statedTotal!==undefined && c.tcv && Math.abs(f.statedTotal - c.tcv) > 1) add("warn","Stated total doesn't match the fee lines", `Order form says ${$0(f.statedTotal)}; fee lines, term and discount compute to ${$0(c.tcv)} (difference ${$0(f.statedTotal-c.tcv)}). Bill from the agreed figure, not either one, until it's resolved.`);
+  else if(f.statedTotal) add("ok","Total reconciles", `${$0(f.statedTotal)} matches fee lines × term less discount.`);
+  const bad=R.filter(r=>r.sev==="bad");
+  const today=new Date(); const todayU=D(today.getUTCFullYear(),today.getUTCMonth(),today.getUTCDate());
+  const past=c.rows.filter(r=>r.inv<todayU);
+  if(past.length && !bad.length) add("warn",`${past.length} invoice${past.length>1?"s":""} already due to have gone out`, `Dated before today (${past.map(r=>fmtD(r.inv)).join(", ")}). Send as catch-up invoices, and check the due dates haven't passed.`);
+  else if(past.length) add("warn",`${past.length} invoice${past.length>1?"s":""} dated before today`, `${past.map(r=>fmtD(r.inv)).join(", ")}. These go out as catch-up invoices once the blockers clear.`);
+  if(c.usage.length) add("warn","Usage fees billed on actuals", c.usage.map(u=>`${u.name}: ${$(u.price)} per ${u.unit||"unit"}`).join("; ")+". Needs a usage report each period; excluded from contract value.");
+  const flagged=[...new Set(f.flagsText)].filter(w=>!/^net /.test(w));
+  if(flagged.length) add("warn","Non-standard clause", `Found: "${flagged.join('", "')}". Route to whoever owns contract review before booking. ${f.special? "Clause: "+f.special:""}`);
+  // setup
+  if(!f.hardware) add("warn","Scanner hardware not stated","Needed to set up the data ingest profile.");
+  else { const ok=STD.hardware.filter(h=>f.hardware.toLowerCase().includes(h.toLowerCase())); const words=f.hardware.split(/\s+and\s+|,\s*|\/\s*/); const unknown=words.filter(w=>!STD.hardware.some(h=>w.toLowerCase().includes(h.toLowerCase()))); if(unknown.length) add("warn","Hardware not on the supported list", `"${unknown.join('", "')}" isn't among ${STD.hardware.join(", ")}. Confirm with solutions engineering before kickoff.`); else add("ok","Hardware supported", f.hardware); }
+  if(!f.format) add("warn","Deliverable format not stated","Needed for the export template.");
+  else if(!STD.formats.some(x=>f.format.toLowerCase().includes(x.toLowerCase().split(" ")[0]))) add("warn","Deliverable format not on the supported list", `"${f.format}" vs ${STD.formats.join(", ")}.`);
+  else add("ok","Deliverable format supported", f.format);
+  if(!f.crs) add("warn","No coordinate system","Drafting needs the datum, projection and units. Ask before the first scan is processed.");
+  if(!f.users) add("warn","No named users","Seats can't be provisioned without user emails.");
+  return R;
+}
+
+/* ---------------- setup checklist ---------------- */
+function setupTasks(f,c){
+  const s=c.start; const W=(d)=> s? fmtD(addDays(s,d)) : "";
+  const users=f.users? f.users.split(/,\s*/).filter(Boolean):[];
+  const seats=f.items.filter(i=>/seat|user|licen/i.test(i.unit)).reduce((a,i)=>a+i.qty,0);
+  const T=[];
+  const P=(phase)=>T.push({phase});
+  const add=(t,sub,when,flag)=>T.push({t,sub,when,flag});
+  P("Before start");
+  if(f.poRequired) add("Get PO number from customer AP", f.po? "On file: "+f.po : "Missing. Blocks invoice #1", W(-7), !f.po);
+  add("Create the account and billing record", `${f.customer||"Customer"} · ${f.orderNo||"order #"} · ${c.arr? $0(c.arr)+" ARR":""}`, W(-5));
+  add(`Provision ${seats||"?"} seats, invite ${users.length} named user${users.length===1?"":"s"}`, users.length? users.join(", ") + (seats&&users.length<seats? ` · ${seats-users.length} seats unassigned`:"") : "No user emails on the order form", W(-3), !users.length);
+  add("Set project defaults: coordinate system and units", f.crs||"Not on the order form", W(-3), !f.crs);
+  add("Load CAD standards / feature library", f.cad||"None specified: use defaults", W(-2), false);
+  add("Configure ingest profile for capture hardware", f.hardware||"Not on the order form", W(-2), !f.hardware || /mosaic/i.test(f.hardware) || !STD.hardware.some(h=>(f.hardware||"").toLowerCase().includes(h.toLowerCase())));
+  add("Set up export template", f.format||"Not on the order form", W(-1), !f.format || !STD.formats.some(x=>(f.format||"").toLowerCase().includes(x.toLowerCase().split(" ")[0])));
+  P("Week 1");
+  add("Kickoff and first scan upload", "Confirm the first dataset processes end to end", W(2));
+  add(c.rows[0]? `Send invoice #1 for ${$0(c.rows[0].amt)}` : "Send invoice #1", c.rows[0]? `Invoice date ${fmtD(c.rows[0].inv)}, due ${fmtD(c.rows[0].due)}`+(f.billContact? " · to "+f.billContact:"") : "Schedule incomplete", c.rows[0]? fmtD(c.rows[0].inv):"", !c.rows[0]);
+  P("First month");
+  add("First deliverable reviewed with customer", "Check drafted features against their CAD standard", W(14));
+  if(c.usage.length) add("Set up monthly usage report for billing", c.usage.map(u=>u.name).join(", "), W(30));
+  P("Renewal");
+  add(c.renewNotice? "Renewal notice deadline" : "Renewal notice period not stated", c.end? `Term ends ${fmtD(c.end)} · ${f.autoRenew?"auto-renews":"no auto-renewal"}` : "", c.renewNotice? fmtD(c.renewNotice) : "", !c.renewNotice);
+  return T;
+}
+
+/* ---------------- render ---------------- */
+let STATE=null;
+const KEYS=[
+ ["customer","Customer","text"],["orderNo","Order form #","text"],["start","Start date","date"],["term","Term (months)","number"],
+ ["freq","Billing frequency","select:Annual,Quarterly,Monthly,Upfront"],["timing","Billed","select:advance,arrears"],["net","Payment terms (Net days)","number"],["discount","Discount %","number"],
+ ["poRequired","PO required","select:true,false"],["po","PO number","text"],["statedTotal","Stated total ($)","number"],["noticeDays","Non-renewal notice (days)","number"],
+ ["custSigned","Customer signed","text"],["mach9Signed","Mach9 signed","text"],["hardware","Capture hardware","text"],["format","Deliverable format","text"],
+ ["crs","Coordinate system","text"],["cad","CAD standards","text"],["users","User emails","text"],["billContact","Billing contact","text"]
+];
+function render(){
+  if(!STATE) return;
+  const {f,src}=STATE; const c=compute(f); const R=check(f,c);
+  const bad=R.filter(r=>r.sev==="bad"), warn=R.filter(r=>r.sev==="warn");
+  const st=document.getElementById("status");
+  st.className="status "+(bad.length?"bad":warn.length?"warn":"ok");
+  const first=c.rows[0];
+  st.innerHTML=`<div class="dot"></div><div><h2>${bad.length? `Not ready to invoice: ${bad.length} blocker${bad.length>1?"s":""}` : warn.length? `Ready to invoice, ${warn.length} to review` : "Ready to invoice and provision"}</h2><p>${esc(f.customer||"Unnamed customer")} · ${c.arr? $0(c.arr)+" ARR · ":""}${c.tcv? $0(c.tcv)+" contract value · ":""}${first? `invoice #1 ${$0(first.amt)} on ${fmtD(first.inv)}`:"schedule incomplete"}</p></div>`;
+
+  // checks
+  const order={bad:0,warn:1,ok:2};
+  document.getElementById("p-checks").innerHTML = `<ul class="checks">${R.slice().sort((a,b)=>order[a.sev]-order[b.sev]).map(r=>`<li><span><span class="pill ${r.sev}">${r.sev==="bad"?"Blocker":r.sev==="warn"?"Review":"OK"}</span></span><div><div class="t">${esc(r.t)}</div><div class="d">${esc(r.d)}</div></div></li>`).join("")}</ul>`;
+
+  // billing
+  let bh = "";
+  if(c.rows.length){
+    bh += `<table><thead><tr><th>#</th><th>Invoice date</th><th>Due</th><th class="hide-sm">Covers</th><th class="num">Amount</th></tr></thead><tbody>`;
+    c.rows.forEach(r=>{ bh+=`<tr><td class="mono">INV-${String(r.n).padStart(2,"0")}</td><td>${fmtD(r.inv)}</td><td>${fmtD(r.due)}</td><td class="hide-sm small">${r.lines.map(l=>esc(l.d)+(r.lines.length>1?` · ${$0(l.a)}`:"")).join("<br>")}</td><td class="num">${$(r.amt)}</td></tr>`; });
+    bh += `</tbody><tfoot><tr><td colspan="4" class="hide-sm">Total scheduled · ${c.rows.length} invoice${c.rows.length>1?"s":""} · ${f.poRequired?("PO "+(f.po||"MISSING")):"no PO required"}</td><td class="num">${$(c.rows.reduce((s,r)=>s+r.amt,0))}</td></tr></tfoot></table>`;
+    if(c.usage.length) bh += `<p class="small" style="margin-top:14px"><span class="pill warn">Usage</span> ${c.usage.map(u=>`${esc(u.name)}: ${$(u.price)} per ${esc(u.unit||"unit")}`).join("; ")}, billed on actuals each period. Not in the totals above.</p>`;
+    bh += `<div class="kv" style="margin-top:18px"><div>List ARR</div><div>${$0(c.listArr)}</div><div>Discount</div><div>${+f.discount||0}% on recurring fees</div><div>Net ARR</div><div>${$0(c.arr)}</div><div>One-time fees</div><div>${$0(c.oneTime)}</div><div>Contract value</div><div>${$0(c.tcv)}${f.statedTotal? ` <span class="small">(order form says ${$0(f.statedTotal)})</span>`:""}</div><div>Term</div><div>${fmtD(c.start)} to ${fmtD(c.end)}</div></div>`;
+  } else bh = `<p class="small">Needs a start date, term and billing frequency. Fill them in under Extracted terms.</p>`;
+  document.getElementById("p-billing").innerHTML = bh;
+
+  // setup
+  document.getElementById("p-setup").innerHTML = setupTasks(f,c).map(x=> x.phase? `<div class="phase">${x.phase}</div>` : `<div class="task ${x.flag?"flag":""}"><input type="checkbox" aria-label="done"><div><div class="t">${esc(x.t)}</div><div class="sub">${esc(x.sub||"")}</div></div><div class="when">${esc(x.when||"")}</div></div>`).join("");
+
+  // terms
+  document.getElementById("p-terms").innerHTML = `<p class="small" style="margin:0 0 14px">Edit anything the reader got wrong. Checks, schedule and setup update as you type.</p><div class="terms">${KEYS.map(([k,l,type])=>{
+    const v=f[k]; const s=src[k]||"default"; let inp;
+    if(type.startsWith("select:")){ inp=`<select data-k="${k}">${type.slice(7).split(",").map(o=>`<option ${String(v)===o?"selected":""}>${o}</option>`).join("")}${v===null||v===undefined?'<option selected value="">—</option>':""}</select>`; }
+    else inp=`<input data-k="${k}" type="${type==="date"?"date":type==="number"?"number":"text"}" value="${esc(v??"")}">`;
+    return `<div class="field ${s==="missing"?"missing":""}"><label><span>${l}</span><span class="src ${s}">${s}</span></label>${inp}</div>`;
+  }).join("")}</div>
+  <div class="phase" style="margin-top:22px">Fee lines</div>
+  <table><thead><tr><th>Item</th><th class="num">Qty</th><th class="num">Price</th><th>Type</th><th class="num hide-sm">Annual</th></tr></thead><tbody>${f.items.map(i=>`<tr><td>${esc(i.name)}</td><td class="num">${i.qty.toLocaleString()}</td><td class="num">${$(i.price)}${i.unit?` <span class="small">/${esc(i.unit)}</span>`:""}</td><td><span class="pill ${i.type==="usage"?"warn":i.type==="one-time"?"blue":""}">${i.type}</span></td><td class="num hide-sm">${i.type==="annual"?$0(i.qty*i.price):i.type==="monthly"?$0(i.qty*i.price*12):"—"}</td></tr>`).join("")||'<tr><td colspan="5" class="small">No fee lines found.</td></tr>'}</tbody></table>`;
+  document.querySelectorAll("#p-terms [data-k]").forEach(el=>{
+    el.addEventListener("input",()=>{ const k=el.dataset.k; let v=el.value;
+      if(["term","net","discount","statedTotal","noticeDays"].includes(k)) v = v===""? null : +v;
+      if(k==="poRequired") v = v==="true";
+      STATE.f[k]=v; STATE.src[k]="edited"; renderKeep(); });
+  });
+
+  // crm
+  const crm = {
+    account: f.customer, order_form: f.orderNo, start_date: iso(c.start), end_date: iso(c.end), term_months: +f.term||null,
+    net_arr_usd: Math.round(c.arr), contract_value_usd: Math.round(c.tcv), one_time_usd: Math.round(c.oneTime),
+    billing: f.freq? `${f.freq} in ${f.timing}`:null, payment_terms: f.net!=null? `Net ${f.net}`:null,
+    po_required: !!f.poRequired, po_number: f.po||null, auto_renew: !!f.autoRenew, renewal_notice_by: iso(c.renewNotice)||null,
+    seats: f.items.filter(i=>/seat|user|licen/i.test(i.unit)).reduce((a,i)=>a+i.qty,0)||null,
+    hardware: f.hardware||null, deliverable_format: f.format||null, coordinate_system: f.crs||null,
+    open_blockers: bad.map(b=>b.t), review_items: warn.map(w=>w.t)
+  };
+  const note = `${f.customer||"Customer"} (${f.orderNo||"no order #"}) is ${bad.length?"NOT ready":"ready"} to invoice.\n`+
+    (first? `Invoice #1: ${$(first.amt)} on ${fmtD(first.inv)}, due ${fmtD(first.due)}${f.poRequired?`, PO ${f.po||"MISSING"}`:""}.\n`:"")+
+    `${c.rows.length} invoice${c.rows.length===1?"":"s"} over ${f.term||"?"} months, ${$0(c.tcv)} contract value, ${$0(c.arr)} ARR.\n`+
+    (bad.length? `Blockers: ${bad.map(b=>b.t).join("; ")}.\n`:"")+
+    (warn.length? `To review: ${warn.map(b=>b.t).join("; ")}.\n`:"")+
+    (c.renewNotice? `Renewal notice deadline ${fmtD(c.renewNotice)}.`:"");
+  document.getElementById("p-crm").innerHTML = `<div class="label"><span>Handoff note</span><button id="cpNote">Copy</button></div><pre class="out" id="note">${esc(note)}</pre>
+  <div class="label" style="margin-top:22px"><span>CRM / billing fields (JSON)</span><button id="cpJson">Copy</button></div><pre class="out" id="json">${esc(JSON.stringify(crm,null,2))}</pre>`;
+  const cp=(id,btn)=>{ document.getElementById(btn).onclick=()=>{ navigator.clipboard?.writeText(document.getElementById(id).textContent); document.getElementById(btn).textContent="Copied"; setTimeout(()=>{const b=document.getElementById(btn); if(b) b.textContent="Copy";},1200); }; };
+  cp("note","cpNote"); cp("json","cpJson");
+}
+function renderKeep(){ // re-render everything except the terms form, so typing keeps focus
+  const real=document.getElementById("p-terms"); real.id="p-terms-keep";
+  const tmp=document.createElement("div"); tmp.id="p-terms"; tmp.hidden=true; document.body.appendChild(tmp);
+  render(); tmp.remove(); real.id="p-terms";
+  real.querySelectorAll("[data-k]").forEach(el=>{ const lab=el.parentElement.querySelector(".src"); const s=STATE.src[el.dataset.k]||"default"; lab.className="src "+s; lab.textContent=s; el.parentElement.classList.toggle("missing", s==="missing"); });
+}
+
+function run(){ const text=document.getElementById("src").value; if(!text.trim()) return; STATE=parse(text); render(); }
+
+/* ---------------- rubric editor ---------------- */
+function rubricUI(){
+  document.getElementById("rubricIn").innerHTML = `
+  <p class="small">The rules every order form is checked against. Change them to match the real standards.</p>
+  <div class="terms">
+   <div class="field"><label><span>Standard payment terms (Net days)</span></label><input id="r-net" type="number" value="${STD.netDays}"></div>
+   <div class="field"><label><span>Max discount without approval %</span></label><input id="r-disc" type="number" value="${STD.maxDiscount}"></div>
+   <div class="field"><label><span>Standard billing</span></label><select id="r-bill">${["Annual in advance","Quarterly in advance","Monthly in advance"].map(o=>`<option ${o===STD.billing?"selected":""}>${o}</option>`).join("")}</select></div>
+   <div class="field"><label><span>Supported hardware</span></label><input id="r-hw" value="${esc(STD.hardware.join(", "))}"></div>
+   <div class="field"><label><span>Supported formats</span></label><input id="r-fmt" value="${esc(STD.formats.join(", "))}"></div>
+   <div class="field"><label><span>Clauses to route for review</span></label><input id="r-watch" value="${esc(STD.watch.join(", "))}"></div>
+  </div>
+  <ul class="small" style="margin:14px 0 0;padding-left:18px">
+   <li>Blockers: missing commercial terms, no fee lines, not countersigned, PO required but missing.</li>
+   <li>Review: terms above standard, non-standard billing, discount above threshold, total that doesn't reconcile, backdated start, usage fees, watch-list clauses, setup details missing or unsupported.</li>
+  </ul>`;
+  const up=()=>{ STD.netDays=+document.getElementById("r-net").value||0; STD.maxDiscount=+document.getElementById("r-disc").value||0; STD.billing=document.getElementById("r-bill").value;
+    STD.hardware=document.getElementById("r-hw").value.split(",").map(s=>s.trim()).filter(Boolean);
+    STD.formats=document.getElementById("r-fmt").value.split(",").map(s=>s.trim()).filter(Boolean);
+    STD.watch=document.getElementById("r-watch").value.split(",").map(s=>s.trim().toLowerCase()).filter(Boolean);
+    if(STATE){ STATE.f.flagsText = STD.watch.filter(w=>document.getElementById("src").value.toLowerCase().includes(w)); render(); } };
+  document.querySelectorAll("#rubricIn input,#rubricIn select").forEach(e=>e.addEventListener("input",up));
+}
+
+/* ---------------- PDF ---------------- */
+async function readPdf(file){
+  if(!window.pdfjsLib){ alert("PDF reader didn't load. Paste the text instead."); return ""; }
+  pdfjsLib.GlobalWorkerOptions.workerSrc="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js";
+  const pdf=await pdfjsLib.getDocument({data:await file.arrayBuffer()}).promise; let out=[];
+  for(let p=1;p<=pdf.numPages;p++){
+    const tc=await (await pdf.getPage(p)).getTextContent(); const rows={};
+    tc.items.forEach(it=>{ const y=Math.round(it.transform[5]/3); (rows[y]=rows[y]||[]).push(it); });
+    Object.keys(rows).sort((a,b)=>b-a).forEach(y=> out.push(rows[y].sort((a,b)=>a.transform[4]-b.transform[4]).map(i=>i.str).join(" ").replace(/\s+/g," ").trim()));
+  }
+  return out.join("\n");
+}
+async function loadFile(file){
+  const text = /\.pdf$/i.test(file.name)? await readPdf(file) : await file.text();
+  document.getElementById("src").value=text; run();
+}
+
+/* ---------------- wiring ---------------- */
+const demosEl=document.getElementById("demos");
+Object.entries(DEMOS).forEach(([k,d])=>{ const b=document.createElement("button"); b.textContent=d.name; b.onclick=()=>{ document.querySelectorAll("#demos button").forEach(x=>x.classList.remove("on")); b.classList.add("on"); document.getElementById("src").value=d.text; run(); }; demosEl.appendChild(b); });
+document.getElementById("run").onclick=run;
+document.getElementById("clear").onclick=()=>{ document.getElementById("src").value=""; STATE=null; document.querySelectorAll("#demos button").forEach(x=>x.classList.remove("on")); document.getElementById("status").className="status idle"; document.getElementById("status").innerHTML='<div class="dot"></div><div><h2>Paste an order form</h2><p>Or load a demo.</p></div>'; ["checks","billing","setup","terms","crm"].forEach(p=>document.getElementById("p-"+p).innerHTML=""); };
+document.getElementById("file").onchange=e=>{ if(e.target.files[0]) loadFile(e.target.files[0]); };
+const ta=document.getElementById("src");
+ta.addEventListener("dragover",e=>{e.preventDefault();ta.style.borderColor="var(--blue)";});
+ta.addEventListener("dragleave",()=>ta.style.borderColor="");
+ta.addEventListener("drop",e=>{e.preventDefault();ta.style.borderColor=""; if(e.dataTransfer.files[0]) loadFile(e.dataTransfer.files[0]);});
+document.getElementById("tabs").addEventListener("click",e=>{ const b=e.target.closest("button"); if(!b) return; document.querySelectorAll("#tabs button").forEach(x=>x.classList.toggle("active",x===b)); document.querySelectorAll(".pane").forEach(p=>p.classList.toggle("active",p.id==="p-"+b.dataset.p)); });
+rubricUI();
+demosEl.firstChild.click();
+</script>
+</body>
+</html>
