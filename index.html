@@ -25,13 +25,19 @@ header.top .wrap{display:flex;justify-content:space-between;align-items:center;h
 .mark{font-family:var(--mono);font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:var(--text)}
 .mark b{color:var(--blue2);font-weight:500}
 .tag{font-family:var(--mono);font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--dim)}
-.hero{padding:56px 0 36px;border-bottom:1px solid var(--line);position:relative;overflow:hidden}
+.hero{padding:36px 0 26px;border-bottom:1px solid var(--line);position:relative;overflow:hidden}
 .eyebrow{font-family:var(--mono);color:var(--blue2);letter-spacing:.12em;text-transform:uppercase;font-size:13px;margin:0 0 18px}
-h1{font-family:var(--display);font-weight:600;font-size:clamp(32px,5vw,56px);line-height:1.04;letter-spacing:-.035em;margin:0 0 18px;max-width:900px}
+h1{font-family:var(--display);font-weight:600;font-size:clamp(30px,4.4vw,48px);line-height:1.04;letter-spacing:-.035em;margin:0 0 18px;max-width:900px}
 .lede{color:var(--muted);font-size:clamp(16px,1.6vw,19px);max-width:720px;margin:0}
+.steps{list-style:none;padding:0;margin:20px 0 0;display:flex;gap:28px;flex-wrap:wrap;font-family:var(--mono);font-size:12px;letter-spacing:.06em;text-transform:uppercase;color:var(--muted)}
+.steps b{color:var(--blue2);font-weight:500;margin-right:8px}
+@media(max-width:560px){.steps{flex-direction:column;gap:8px}}
 .annot{position:absolute;right:24px;top:58px;font-family:var(--mono);font-size:11px;color:var(--dim);text-align:right;line-height:1.9;letter-spacing:.04em}
 .annot span{color:var(--mag)}
-@media(max-width:980px){.annot{display:none}}
+@media(max-width:980px){.steps{list-style:none;padding:0;margin:20px 0 0;display:flex;gap:28px;flex-wrap:wrap;font-family:var(--mono);font-size:12px;letter-spacing:.06em;text-transform:uppercase;color:var(--muted)}
+.steps b{color:var(--blue2);font-weight:500;margin-right:8px}
+@media(max-width:560px){.steps{flex-direction:column;gap:8px}}
+.annot{display:none}}
 .grid{display:grid;grid-template-columns:minmax(0,5fr) minmax(0,7fr);gap:0;max-width:1240px;margin:0 auto}
 main{border-bottom:1px solid var(--line)}
 .pane{overflow-x:auto}
@@ -107,15 +113,14 @@ footer p{margin:0 0 6px;max-width:760px}
 </div></header>
 
 <section class="hero"><div class="wrap">
-  <p class="eyebrow">Quote-to-cash · billing · customer setup</p>
-  <h1>Signed order form in. Billing schedule and customer setup out.</h1>
-  <p class="lede">Billing and onboarding both work from the order form. This reads it once, checks it against a rubric, flags anything that blocks the first invoice, and turns it into an invoice schedule, a setup checklist and CRM fields. Nothing leaves your browser.</p>
-  <div class="annot" aria-hidden="true">OF-0142 → INV-01<br>NET 45 · PO <span>MISSING</span><br>CRS NAD83 · DGN<br>STN 01 → GO-LIVE</div>
+  <h1>Is this order form ready to invoice?</h1>
+  <p class="lede">Paste a signed order form. Get what's blocking the first invoice, the invoice schedule and the customer setup checklist.</p>
+  <ol class="steps"><li><b>01</b>Paste or drop the order form</li><li><b>02</b>Fix blockers: missing PO, unsigned, totals off</li><li><b>03</b>Copy invoices, setup tasks and CRM fields</li></ol>
 </div></section>
 
 <main class="grid">
   <section class="col left">
-    <div class="label"><span>Order form</span><span class="r">paste text or drop a PDF</span></div>
+    <div class="label"><span>Order form</span><span class="r">demo loaded · try the others</span></div>
     <div class="demos" id="demos"></div>
     <textarea id="src" spellcheck="false" placeholder="Paste the order form text here, or drop a PDF onto this box."></textarea>
     <div class="row">
@@ -133,7 +138,7 @@ footer p{margin:0 0 6px;max-width:760px}
   </section>
 
   <section class="col right">
-    <div class="status idle" id="status"><div class="dot"></div><div><h2>Load a demo or paste an order form</h2><p>Start with the agency demo. It has one blocker.</p></div></div>
+    <div class="status idle" id="status"><div class="dot"></div><div><h2>Load a demo or paste an order form</h2><p>Results appear here.</p></div></div>
     <nav class="tabs" id="tabs">
       <button data-p="checks" class="active">Checks</button>
       <button data-p="billing">Billing schedule</button>
@@ -164,7 +169,7 @@ const DEMOS = {
 agency: {name:"State DOT (demo)", text:
 `ORDER FORM (DEMO)
 Order form #: OF-2026-0142
-Customer: Company A (state department of transportation)
+Customer: Company A
 Bill to: Company A, Accounts Payable
 Billing contact: ap-invoices@company-a.example
 
@@ -197,7 +202,7 @@ Signed by Mach9: 19 Nov 2026`},
 firm: {name:"Engineering firm (demo)", text:
 `ORDER FORM (DEMO)
 Order form #: OF-2026-0139
-Customer: Company B (engineering firm)
+Customer: Company B
 Billing contact: accounting@company-b.example
 
 Subscription start date: 15 Nov 2026
@@ -226,7 +231,7 @@ Signed by Mach9: 29 Oct 2026`},
 telecom: {name:"Fiber contractor (demo)", text:
 `ORDER FORM (DEMO)
 Order form #: OF-2026-0133
-Customer: Company C (fiber contractor)
+Customer: Company C
 
 Subscription start date: 1 Oct 2026
 Subscription term: 12 months
