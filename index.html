@@ -124,7 +124,7 @@ footer p{margin:0 0 6px;max-width:760px}
       <input type="file" id="file" accept=".pdf,.txt" hidden>
       <button id="clear">Clear</button>
     </div>
-    <p class="hint">Demo order forms are invented: customers, prices and terms are placeholders, not Mach9's. Labels are matched loosely ("Payment terms", "Net 45", "PO #"), and anything the reader misses can be typed into Extracted terms.</p>
+    <p class="hint">Demo order forms use placeholder customers (Company A, B, C) and illustrative prices and terms, not Mach9's. Labels are matched loosely ("Payment terms", "Net 45", "PO #"), and anything the reader misses can be typed into Extracted terms.</p>
 
     <details class="rubric" id="rubricBox">
       <summary>Rubric and standards (editable)</summary>
@@ -162,11 +162,11 @@ footer p{margin:0 0 6px;max-width:760px}
 /* ---------------- demo order forms (invented) ---------------- */
 const DEMOS = {
 agency: {name:"State DOT (demo)", text:
-`ORDER FORM (DEMO, INVENTED)
+`ORDER FORM (DEMO)
 Order form #: OF-2026-0142
-Customer: Cascade State Department of Transportation
-Bill to: Accounts Payable, Cascade State DOT, PO Box 47300, Olympia
-Billing contact: ap-invoices@cascadedot.example
+Customer: Company A (state department of transportation)
+Bill to: Company A, Accounts Payable
+Billing contact: ap-invoices@company-a.example
 
 Subscription start date: 1 Dec 2026
 Subscription term: 24 months
@@ -188,17 +188,17 @@ Scanner hardware: Leica Pegasus TRK700
 Deliverable format: DGN (MicroStation)
 Coordinate system: NAD83(2011) / State Plane North, US survey feet
 CAD standards: Agency CAD standards v4 (feature library attached as Exhibit B)
-Users: r.alvarez@cascadedot.example, m.chen@cascadedot.example, j.okafor@cascadedot.example, s.berg@cascadedot.example, t.nguyen@cascadedot.example, l.price@cascadedot.example
+Users: user1@company-a.example, user2@company-a.example, user3@company-a.example, user4@company-a.example, user5@company-a.example, user6@company-a.example
 
 Special terms: Customer may terminate for convenience on 30 days' written notice.
 
-Signed by Customer: Dana Whitfield, Contracts Officer, 18 Nov 2026
+Signed by Customer: 18 Nov 2026
 Signed by Mach9: 19 Nov 2026`},
 firm: {name:"Engineering firm (demo)", text:
-`ORDER FORM (DEMO, INVENTED)
+`ORDER FORM (DEMO)
 Order form #: OF-2026-0139
-Customer: Northline Engineering Group, LLC
-Billing contact: accounting@northline.example
+Customer: Company B (engineering firm)
+Billing contact: accounting@company-b.example
 
 Subscription start date: 15 Nov 2026
 Subscription term: 12 months
@@ -218,15 +218,15 @@ Project setup:
 Scanner hardware: RIEGL VMX-2HA
 Deliverable format: DXF (Civil 3D)
 Coordinate system: NAD83 / California zone 3, US survey feet
-CAD standards: Northline drafting standard 2025
-Users: p.ramos@northline.example, k.lee@northline.example, a.shah@northline.example
+CAD standards: Company B drafting standard
+Users: user1@company-b.example, user2@company-b.example, user3@company-b.example
 
-Signed by Customer: Priya Ramos, Principal, 28 Oct 2026
+Signed by Customer: 28 Oct 2026
 Signed by Mach9: 29 Oct 2026`},
 telecom: {name:"Fiber contractor (demo)", text:
-`ORDER FORM (DEMO, INVENTED)
+`ORDER FORM (DEMO)
 Order form #: OF-2026-0133
-Customer: Ridgefield Fiber Constructors Inc.
+Customer: Company C (fiber contractor)
 
 Subscription start date: 1 Oct 2026
 Subscription term: 12 months
@@ -243,11 +243,11 @@ Total contract value: $40,000
 Project setup:
 Scanner hardware: Trimble MX50 and Mosaic 51
 Deliverable format: KMZ
-Users: ops@ridgefieldfiber.example
+Users: ops@company-c.example
 
 Special terms: Most favored customer pricing for the initial term.
 
-Signed by Customer: Eli Novak, COO, 14 Oct 2026
+Signed by Customer: 14 Oct 2026
 Signed by Mach9:`}
 };
 
